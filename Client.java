@@ -20,7 +20,7 @@ public class Client extends Thread{
 		this.socket = socket;
 	}
 	
-	public void run() {
+	public void run() { //Listening 부분 서버->클라이언트
 		try {
         	InputStream input = socket.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8));
@@ -40,23 +40,28 @@ public class Client extends Thread{
             //소켓 서버에 접속
             socket = new Socket("192.168.219.108", 1234); //연결요청보냄
             System.out.println("connect server!"); //접속 성공
-
-            Client client = new Client(socket);
-            client.start();
             
-            Scanner scanner = new Scanner(System.in); //채팅용 scanner
-            while(true) {
-            	try {
+            //ListeningThread t1 = new ListeningThread(socket);과 유사
+            Client client = new Client(socket); //Listening 부분을 객체로 생성 
+            //t1.start(); 과 유사
+            client.start();//Listening 부분을 실행
+            
+            Scanner scanner = new Scanner(System.in); //채팅용 scanner   
+            try {
 
-                    PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
-                    while(true) {
-                        writer.println(scanner.nextLine()); //입력한 메세지 발송
-                    }
+                   PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
+                   while(true) {
+                	   String scanString = scanner.nextLine();
+                       writer.println(scanString); //입력한 메세지 발송
+                       if (scanString.equals("quit")) {
+                           System.out.println("you push quit!!!");
+                           break;
+                       }
+                   }
 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -26,7 +26,6 @@ public class WritingThread extends Thread{ // 서버로 메세지 보내는 Thread
             PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
             while(true) {
                 writer.println(scanner.nextLine()); //입력한 메세지 발송
-                System.out.println("-"+writer+"-");
             }
 
         } catch (Exception e) {
