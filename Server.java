@@ -46,6 +46,7 @@ public class Server extends Thread {
 				
 				String readValue; // Client에서 보낸 값 저장
 				String name = null; // 클라이언트 이름 설정용
+				Socket theSocket = null; // 본인 소켓 담기
 				boolean identify = false;
 				
 	            		// 클라이언트가 메세지 입력시마다 수행
@@ -54,30 +55,48 @@ public class Server extends Thread {
 					if(!identify) { // 연결 후 한번만 노출
 						name = readValue; // 이름 할당
 						identify = true;
-						writer.println(name + "님이 입장하셨습니다.");
+						writer.println(name + " enter room.");
 						continue;
 					}
+					
+					if (readValue.equals("quit")) {
+	                    System.out.println("it push quit");
+	                    for (int i = 0; i < list.size(); i++) {
+	                        if (theSocket == list.get(i)) {
+	                            out = list.get(i).getOutputStream();
+	                            writer = new PrintWriter(out, true);
+	                            writer.println("you are fired");
+	                            list.remove(theSocket);
+	                        }
+	                    }
+	                    continue;
+	                }
 					
 	                // list 안에 클라이언트 정보가 담겨있음
 					for(int i = 0; i<list.size(); i++) 
 					{ 
 						out = list.get(i).getOutputStream();
 						writer = new PrintWriter(out, true);
-						//new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8)
-	                    			// 클라이언트에게 메세지 발송
-						writer.println(name + " : " + readValue); 
+						writer.println(name + " : " + readValue);
+						writer.println(list.get(i)); 
 					}
 				}
 			} 
 			catch (Exception e) 
 			{
 			    e.printStackTrace(); // 예외처리
-			}    		
+			} finally {
+				try {
+					socket.close();
+				}catch(IOException e){
+					System.out.println("비정상적인 종료");
+				}
+			}
     	}	
 	
 	public static void main(String[] args) {
     		try {
-                      int socketPort = 4321; // 소켓 포트 설정용
+                      int socketPort = 1234; // 소켓 포트 설정용
                       ServerSocket serverSocket = new ServerSocket(socketPort); // 서버 소켓 만들기, bind()
                       // 서버 오픈 확인용
                       System.out.println("socket : " + socketPort + "으로 서버가 열렸습니다");
